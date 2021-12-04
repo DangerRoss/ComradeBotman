@@ -77,7 +77,6 @@ namespace ComradeBotman
         private async Task ProcessDataFeeds()
         {
             var feeds = from IDataFeed dataFeed in this.dataFeeds select dataFeed.GetMessageAsync();
-            var processed = this.dataFeeds.Length;
             
             foreach(var feedTask in feeds)
             {
