@@ -3,18 +3,22 @@ using System.Linq;
 using System.Xml;
 using System.Threading.Tasks;
 
+using ComradeBotman.Persistence;
+
 namespace ComradeBotman.DataFeeds
 {
     sealed class RssFeed : WebDataFeed
     {
         private string channelTitle;
+        private string lastUrlKey;
 
-        private string lastUrlMessage;
+        private PersistenceStore store;
 
-        public RssFeed(Uri url, string channelTitle) : base(url) 
+        public RssFeed(Uri url, string channelTitle, PersistenceStore store, string lastUrlKey) : base(url) 
         {
             this.channelTitle = channelTitle;
-            this.lastUrlMessage = null;
+            this.lastUrlKey = lastUrlKey;
+            this.store = store;
         }
 
         public override Task<string> GetMessageAsync() => CreateMessage();
@@ -43,13 +47,13 @@ namespace ComradeBotman.DataFeeds
 
                 var url = items.First()["link"].InnerText;
 
-                if (string.Equals(this.lastUrlMessage, url))
+                if (string.Equals(this.store.GetKeyValue(this.lastUrlKey), url))
                 {
                     return null;
                 }
                 else
                 {
-                    this.lastUrlMessage = url;
+                    this.store.SetKeyValue(this.lastUrlKey, url);
                     return url;
                 }
             }

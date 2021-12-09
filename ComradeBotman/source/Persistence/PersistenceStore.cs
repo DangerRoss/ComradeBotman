@@ -58,7 +58,7 @@ namespace ComradeBotman.Persistence
             {
                 if (!this.store.TryAdd(key, value))
                 {
-                    this.store[key] = value;
+                    this.store[key] = value;                    
                 }
             }            
         }

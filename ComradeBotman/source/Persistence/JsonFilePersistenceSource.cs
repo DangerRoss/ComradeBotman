@@ -9,6 +9,8 @@ namespace ComradeBotman.Persistence
     {
         private readonly FileInfo file;
 
+        public JsonFilePersistenceSource(string path) : this(new FileInfo(path)) { }
+
         public JsonFilePersistenceSource(FileInfo file)
         {
             this.file = file;
@@ -20,7 +22,7 @@ namespace ComradeBotman.Persistence
 
             using var fs = new FileStream(this.file.FullName, FileMode.OpenOrCreate, FileAccess.Write);
             using var writer = new Utf8JsonWriter(fs);
-
+                        
             JsonSerializer.Serialize(writer, new Model() { keyvalues = kvps });
         }
 
@@ -37,8 +39,10 @@ namespace ComradeBotman.Persistence
                 }
 
                 var model = JsonSerializer.Deserialize<Model>(data);
-
-                store.SetKeyValues(model.keyvalues);
+                if(model != null && model.keyvalues != null)
+                {
+                    store.SetKeyValues(model.keyvalues);
+                }                
             }
         }
 

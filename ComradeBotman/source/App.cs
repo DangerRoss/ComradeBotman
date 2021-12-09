@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using ComradeBotman.DataFeeds;
+using ComradeBotman.Persistence;
 
 using Discord;
 using Discord.WebSocket;
@@ -15,14 +16,22 @@ namespace ComradeBotman
     {
         private DiscordSocketClient client;
 
-        private IDataFeed[] dataFeeds;
-
         private IEnumerable<SocketGuild> servers;
 
         private bool ready;
 
+        private PersistenceStore store;
+
+        private IPersistenceSource storeSource;
+
+        private IDataFeed[] dataFeeds;
+
         public App()
         {
+            this.store = new PersistenceStore();
+            this.storeSource = new JsonFilePersistenceSource("state.json");
+            this.store.Load(this.storeSource);
+
             this.ready = false;
             this.servers = Enumerable.Empty<SocketGuild>();
             this.client = new DiscordSocketClient();
@@ -32,8 +41,8 @@ namespace ComradeBotman
 
             this.dataFeeds = new IDataFeed[]
             {
-                new RssFeed(new Uri("https://thehardtimes.net/feed"), "The Hard Times"),
-                new RssFeed(new Uri("https://hard-money.net/feed"), "Hard Money")
+                new RssFeed(new Uri("https://thehardtimes.net/feed"), "The Hard Times", this.store, "rss.hardtimes.lasturl"),
+                new RssFeed(new Uri("https://hard-money.net/feed"), "Hard Money", this.store, "rss.hardmoney.lasturl")
             };
         }
 
@@ -69,6 +78,8 @@ namespace ComradeBotman
                 Console.Out.WriteLine("Checking data feeds");
 
                 await ProcessDataFeeds();
+
+                this.store.Flush(this.storeSource);
 
                 await Task.Delay(TimeSpan.FromMinutes(60));
             }            
