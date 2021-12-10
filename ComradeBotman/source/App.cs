@@ -141,15 +141,8 @@ namespace ComradeBotman
 
             if(string.IsNullOrWhiteSpace(loginToken))
             {
-                Console.WriteLine("Please enter bot login token...");
-                loginToken = Console.ReadLine();
-
-                if(string.IsNullOrWhiteSpace(loginToken))
-                {
-                    Console.WriteLine("no login token provided, closing");
-                    return;
-                }
-                Console.Clear();
+                Console.WriteLine("no login token provided, closing");
+                return;
             }
 
             using var app = new App();
@@ -183,7 +176,20 @@ namespace ComradeBotman
                 }
             }
 
-            return Environment.GetEnvironmentVariable(variable, EnvironmentVariableTarget.Process);
+            var token = Environment.GetEnvironmentVariable(variable, EnvironmentVariableTarget.Process);
+
+#if DEBUG
+
+            if(string.IsNullOrWhiteSpace(token))
+            {
+                Console.WriteLine("Please enter bot login token...");
+                token = Console.ReadLine();
+                Console.Clear();
+            }
+
+#endif
+
+            return token;
         }        
     }
 }
