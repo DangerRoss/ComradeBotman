@@ -20,7 +20,7 @@ namespace ComradeBotman.Persistence
         {
             var kvps = store.GetKeyValues();
 
-            using var fs = new FileStream(this.file.FullName, FileMode.OpenOrCreate, FileAccess.Write);
+            using var fs = new FileStream(this.file.FullName, FileMode.Create, FileAccess.Write);
             using var writer = new Utf8JsonWriter(fs);
                         
             JsonSerializer.Serialize(writer, new Model() { keyvalues = kvps });
